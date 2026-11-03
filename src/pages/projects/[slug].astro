@@ -1,0 +1,72 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../site';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, date, tags, liveUrl, repoUrl, cover, coverAlt, preview, previewAlt } =
+  project.data;
+
+const FRAME_RATIO = 644 / 589;
+const FRAMES_PER_SECOND = 0.50;
+const scrollDistance = preview
+  ? Math.max(0, preview.height / preview.width - FRAME_RATIO)
+  : 0;
+const duration = Math.max(2, scrollDistance / FRAMES_PER_SECOND).toFixed(1);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: title,
+  description,
+  url: `${SITE.url}/projects/${project.id}`,
+  dateCreated: date.toISOString(),
+  author: { '@type': 'Person', name: SITE.name, url: SITE.url },
+  keywords: tags.join(', '),
+};
+---
+<BaseLayout title={title} description={description} type="article" image={cover?.src} jsonLd={jsonLd}>
+  <article class="wrap">
+    <header class="project-hero">
+      <div class="project-copy">
+        <h1>{title}</h1>
+        <p class="project-meta">{description}</p>
+        <ul class="tags" aria-label="Technologies">
+          {tags.map((t) => <li>{t}</li>)}
+        </ul>
+        <div class="project-links">
+          {liveUrl && <a class="button" href={liveUrl} rel="noopener" target="_blank">View live site</a>}
+          {repoUrl && <a class="button secondary" href={repoUrl} rel="noopener" target="_blank">View code</a>}
+        </div>
+      </div>
+
+      {preview && (
+        <div class="preview" style={`--duration: ${duration}s;`} tabindex="0">
+          <Image
+            src={preview}
+            alt={previewAlt ?? ''}
+            widths={[589, 1178]}
+            sizes="(min-width: 60rem) 589px, 100vw"
+          />
+          <span class="hover-badge" aria-hidden="true">hover!</span>
+        </div>
+      )}
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p><a class="button" href="/#projects">&larr; All projects</a></p>
+  </article>
+</BaseLayout>

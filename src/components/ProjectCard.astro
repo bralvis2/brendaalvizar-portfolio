@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, description, tags, cover, coverAlt, preview, previewAlt, liveUrl, repoUrl } =
+  project.data;
+
+const image = preview ?? cover;
+const imageAlt = preview ? previewAlt : coverAlt;
+const isScrolling = Boolean(preview);
+
+const FRAME_RATIO = 644 / 589;
+const FRAMES_PER_SECOND = 0.4;
+const scrollDistance = preview
+  ? Math.max(0, preview.height / preview.width - FRAME_RATIO)
+  : 0;
+const duration = Math.max(2, scrollDistance / FRAMES_PER_SECOND).toFixed(1);
+---
+<article class="card">
+  <div
+    class:list={['card-preview', { 'is-static': !isScrolling }]}
+    style={`--duration: ${duration}s;`}
+  >
+    {image && (
+      <Image
+        src={image}
+        alt={imageAlt ?? ''}
+        widths={[320, 640]}
+        sizes="(min-width: 768px) 320px, 80vw"
+      />
+    )}
+    <!-- {isScrolling && <span class="hover-badge" aria-hidden="true">hover!</span>} -->
+  </div>
+
+  <div class="card-body">
+    <h3>{title}</h3>
+    <p>{description}</p>
+    <ul class="tags" aria-label="Technologies">
+      {tags.map((t) => <li>{t}</li>)}
+    </ul>
+    <div class="card-actions">
+      {liveUrl && (
+        <a class="button small" href={liveUrl} rel="noopener" target="_blank">View live site</a>
+      )}
+      {repoUrl && (
+        <a class="button small secondary" href={repoUrl} rel="noopener" target="_blank">View code</a>
+      )}
+    </div>
+  </div>
+</article>

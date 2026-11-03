@@ -1,0 +1,173 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { SITE } from "../site";
+import { BIO, SKILLS, EXPERIENCE, EDUCATION, TOOLS } from "../data/resume";
+import * as simpleIcons from "simple-icons";
+
+const projects = (
+  await getCollection("projects", ({ data }) => !data.draft)
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: SITE.name,
+  url: SITE.url,
+  jobTitle: SITE.role,
+  sameAs: [SITE.github, SITE.linkedin],
+};
+
+// Two identical groups make the ticker loop seamlessly
+const tickerGroups = [0, 1];
+
+type Icon = { path: string; title: string; hex: string };
+const icons = simpleIcons as unknown as Record<string, Icon | undefined>;
+const tools = TOOLS.map((tool) => ({ ...tool, svg: icons[tool.icon] }));
+const showNames = false; // set to true to show the name next to each logo
+---
+
+<BaseLayout title={SITE.name} description={SITE.description} jsonLd={jsonLd}>
+  <section class="hero-banner">
+    <div class="hero-bg" aria-hidden="true">
+      <span class="blob b1"></span>
+      <span class="blob b2"></span>
+      <span class="blob b3"></span>
+      <span class="blob b4"></span>
+      <span class="blob b5"></span>
+    </div>
+
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>Full-stack developer, from WordPress to custom code.</h1>
+        <p class="hero-sub">
+          5+ years building sites for clients and teams. Take a look at some of
+          the work.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="#work">See my work</a>
+          <a class="button secondary" href={`mailto:${SITE.email}`}
+            >Get in touch</a
+          >
+        </div>
+      </div>
+
+      <ul class="hero-badges" aria-label="Highlights">
+        <li class="badge badge-years">
+          <strong>5+</strong>
+          <span>Years of Experience</span>
+        </li>
+        <li class="badge badge-role">
+          <strong>Multiple <br /> Platforms</strong>
+          <span>Frameworks and CMSs</span>
+        </li>
+        <li class="badge badge-skills">
+          <strong>New or <br />Existing</strong>
+          <span>Builds, fixes and upkeeps</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      {
+        tickerGroups.map(() => (
+          <div class="ticker-group">
+            {tools.map((tool) => (
+              <span class="tool">
+                {tool.svg && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="22"
+                    height="22"
+                    fill="currentColor"
+                  >
+                    <path d={tool.svg.path} />
+                  </svg>
+                )}
+                {(!tool.svg || showNames) && (
+                  <span class="tool-name">{tool.name}</span>
+                )}
+              </span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </d>
+</BaseLayout>
+
+ <section id="work" aria-labelledby="work-heading">
+  <div  class="section wrap">
+  <p class="eyebrow">Built, launched, maintained</p>
+    <h2 id="work-heading">Client and Personal Projects</h2>
+    <div class="card-grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </div>
+</section>
+
+<section class="frame" id="about" aria-labelledby="about-heading">
+  <div class="frame-inner">
+    <div class="about">
+      <h2 id="about-heading">About <br />Brenda Alvizar</h2>
+
+      <div class="about-side">
+        {BIO.map((paragraph) => <p class="about-bio">{paragraph}</p>)}
+
+        <h3>Skills</h3>
+        <ul class="tags" aria-label="Technical skills">
+          {SKILLS.technical.map((s) => <li>{s}</li>)}
+        </ul>
+        <ul class="tags" aria-label="Strengths">
+          {SKILLS.strengths.map((s) => <li>{s}</li>)}
+        </ul>
+
+        <h3>Education</h3>
+        <ul class="edu-list">
+          {
+            EDUCATION.map((e) => (
+              <li>
+                <strong>{e.title}</strong>
+                <span>
+                  {e.school}, {e.year}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="about-main">
+        <h3>Experience</h3>
+        <ol class="timeline">
+          {
+            EXPERIENCE.map((job) => (
+              <li>
+                <h4>{job.role}</h4>
+                <p class="timeline-meta">
+                  {job.org} <span>{job.dates}</span>
+                </p>
+                <ul>
+                  {job.points.map((point) => (
+                    <li>{point}</li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="cta-heading">
+  <div class="wrap">
+    <h2 id="cta-heading">Have a project in mind?</h2>
+    <p>Tell me what you're building and let's talk about how I can help.</p>
+    <a class="button" href={`mailto:${SITE.email}`}>Start a conversation</a>
+  </div>
+</section>

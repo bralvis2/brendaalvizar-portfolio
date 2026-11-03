@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../site';
+
+const updated = 'November 1, 2026';
+---
+<BaseLayout
+  title="Privacy Policy"
+  description="How this website handles visitor information. It does not use analytics, forms or advertising."
+>
+  <article class="wrap legal prose">
+    <h1>Privacy Policy</h1>
+    <p class="project-meta">Last updated: {updated}</p>
+
+    <p>
+      This website is a portfolio for {SITE.name}. It is designed to collect as little
+      information about you as possible.
+    </p>
+
+    <h2>What I collect</h2>
+    <p>
+      I do not run analytics, advertising, tracking tools or contact forms on this site, and
+      I do not set cookies myself. I do not ask you to create an account or share personal
+      details to browse it.
+    </p>
+
+    <h2>Email</h2>
+    <p>
+      If you email me at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>, I receive your
+      email address and whatever you choose to write. I use it only to reply to you, and I do
+      not sell it or share it for marketing.
+    </p>
+
+    <h2>Hosting</h2>
+    <p>
+      The site is hosted by Cloudflare. Like most hosts, Cloudflare processes technical
+      information when you visit, such as your IP address and browser type, to deliver the
+      site and keep it secure. You can read how they handle it in
+      <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
+    </p>
+
+    <h2>Other websites</h2>
+    <p>
+      This site links to places like GitHub and LinkedIn, and to client websites. Those sites
+      have their own privacy practices, which I do not control.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      If I add tools such as analytics, I will update this page and the date above.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy? Email <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </article>
+</BaseLayout>

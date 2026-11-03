@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+import shot from '../assets/aviellejaybeauty-com.jpg';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Scroll preview test</title>
+  </head>
+  <body>
+    <main>
+      <h1>Scroll preview test</h1>
+
+      <h2>A: Optimized &lt;Image&gt; + transform</h2>
+      <div class="frame">
+        <Image src={shot} alt="Avielle Jay Beauty homepage" widths={[589, 1178]} sizes="589px" />
+      </div>
+
+      <h2>B: Original background-position approach</h2>
+      <div class="bg" style={`background-image: url("${shot.src}")`} role="img" aria-label="Avielle Jay Beauty homepage"></div>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; background: #f6f4f1; color: #222; }
+  main { max-width: 640px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  h1 { margin-bottom: 1.5rem; }
+  h2 { font-size: 1rem; margin: 2rem 0 0.75rem; }
+</style>
+
+<style>
+  /* A: img + transform */
+  .frame {
+    --h: 644px;
+    --duration: 6s;
+    max-width: 589px;
+    height: var(--h);
+    overflow: hidden;
+    box-shadow: 5px 5px 5px #ccc;
+  }
+  .frame :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform var(--duration) ease;
+  }
+  .frame:hover :global(img) {
+    transform: translateY(calc(-100% + var(--h)));
+  }
+
+  /* B: background-position */
+  .bg {
+    max-width: 589px;
+    aspect-ratio: 589 / 644;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: top;
+    transition: background-position 6s ease;
+    box-shadow: 5px 5px 5px #ccc;
+  }
+  .bg:hover {
+    background-position: bottom;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame :global(img), .bg { transition: none; }
+  }
+</style>
